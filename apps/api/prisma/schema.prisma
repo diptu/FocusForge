@@ -106,7 +106,14 @@ model Goal {
   /// Free-form per exam since scoring scales differ (GRE 260-340, IELTS
   /// 0-9 bands) — not worth a typed schema for a handful of display strings.
   currentScores Json?
-  createdAt     DateTime @default(now())
+  /// Existing Skill ids the learner explicitly picked to target, so the LLM
+  /// prompt can require those exact names verbatim instead of hoping its
+  /// own free-text-derived guess matches an existing Skill by name (see
+  /// goals.service.ts resolveOrCreateSkill's case-insensitive lookup).
+  /// Categories the goal implies beyond this list are still inferred by
+  /// the model from `description` and created fresh on selection.
+  targetSkillIds Int[]    @default([])
+  createdAt      DateTime @default(now())
   /// Set when a plan option is selected and its PlannedTargets are created.
   appliedAt     DateTime?
 

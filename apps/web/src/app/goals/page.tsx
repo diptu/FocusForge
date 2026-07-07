@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
+import { getSkills } from "@/lib/api";
 import { GoalPlanner } from "./goal-planner";
 
 export const metadata: Metadata = {
   title: "Goals — FocusForge",
 };
 
-export default function GoalsPage() {
+export default async function GoalsPage() {
+  const skills = await getSkills();
+
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 py-16">
       <header className="flex flex-col gap-2">
@@ -19,7 +22,7 @@ export default function GoalsPage() {
         </p>
       </header>
 
-      <GoalPlanner />
+      <GoalPlanner initialSkills={skills} />
     </main>
   );
 }

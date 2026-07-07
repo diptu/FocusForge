@@ -230,6 +230,7 @@ export type Goal = {
   description: string;
   durationWeeks: number;
   currentScores: GoalScore[] | null;
+  targetSkillIds: number[];
   createdAt: string;
   appliedAt: string | null;
   selectedPlanOptionId: number | null;
@@ -241,6 +242,7 @@ export type CreateGoalInput = {
   description: string;
   durationWeeks: number;
   currentScores?: GoalScore[];
+  targetSkillIds?: number[];
 };
 
 export function createGoal(input: CreateGoalInput) {

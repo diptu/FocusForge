@@ -19,7 +19,38 @@ describe("validateGoalInput", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.value.currentScores).toEqual([]);
+      expect(result.value.targetSkillIds).toEqual([]);
     }
+  });
+
+  it("dedupes targetSkillIds", () => {
+    const result = validateGoalInput({
+      description: "Learn JS",
+      durationWeeks: 8,
+      targetSkillIds: [2, 3, 2],
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.targetSkillIds).toEqual([2, 3]);
+    }
+  });
+
+  it("rejects a non-positive targetSkillId", () => {
+    const result = validateGoalInput({
+      description: "Learn JS",
+      durationWeeks: 8,
+      targetSkillIds: [2, -1],
+    });
+    expect(result.ok).toBe(false);
+  });
+
+  it("rejects more than 10 targetSkillIds", () => {
+    const result = validateGoalInput({
+      description: "Learn JS",
+      durationWeeks: 8,
+      targetSkillIds: Array.from({ length: 11 }, (_, i) => i + 1),
+    });
+    expect(result.ok).toBe(false);
   });
 
   it("rejects an empty description", () => {

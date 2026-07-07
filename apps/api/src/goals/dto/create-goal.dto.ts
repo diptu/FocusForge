@@ -1,9 +1,11 @@
 import { Type } from "class-transformer";
 import {
+  ArrayMaxSize,
   IsArray,
   IsInt,
   IsNotEmpty,
   IsOptional,
+  IsPositive,
   IsString,
   Max,
   MaxLength,
@@ -39,4 +41,12 @@ export class CreateGoalDto {
   @ValidateNested({ each: true })
   @Type(() => GoalScoreDto)
   currentScores?: GoalScoreDto[];
+
+  /** Existing Skill ids the learner explicitly wants this plan to target. */
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @IsInt({ each: true })
+  @IsPositive({ each: true })
+  targetSkillIds?: number[];
 }

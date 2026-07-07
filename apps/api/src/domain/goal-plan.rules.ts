@@ -9,12 +9,14 @@ export interface ValidGoalInput {
   description: string;
   durationWeeks: number;
   currentScores: ValidGoalScore[];
+  targetSkillIds: number[];
 }
 
 const MAX_DESCRIPTION_LENGTH = 500;
 const MAX_SCORE_LABEL_LENGTH = 60;
 const MAX_SCORE_VALUE_LENGTH = 30;
 const MAX_SCORES = 10;
+const MAX_TARGET_SKILLS = 10;
 const MIN_DURATION_WEEKS = 1;
 const MAX_DURATION_WEEKS = 52;
 
@@ -29,6 +31,7 @@ export function validateGoalInput(input: {
   description: string;
   durationWeeks: number;
   currentScores?: { label: string; score: string }[];
+  targetSkillIds?: number[];
 }): Result<ValidGoalInput> {
   const description = input.description.trim();
   if (description.length === 0) {
@@ -73,7 +76,21 @@ export function validateGoalInput(input: {
     currentScores.push({ label, score });
   }
 
-  return ok({ description, durationWeeks: input.durationWeeks, currentScores });
+  const rawTargetSkillIds = input.targetSkillIds ?? [];
+  if (rawTargetSkillIds.length > MAX_TARGET_SKILLS) {
+    return err("TOO_MANY_TARGET_SKILLS", `Provide at most ${MAX_TARGET_SKILLS} target skills`);
+  }
+  if (rawTargetSkillIds.some((id) => !Number.isInteger(id) || id <= 0)) {
+    return err("INVALID_TARGET_SKILL_ID", "targetSkillIds must be positive integers");
+  }
+  const targetSkillIds = [...new Set(rawTargetSkillIds)];
+
+  return ok({
+    description,
+    durationWeeks: input.durationWeeks,
+    currentScores,
+    targetSkillIds,
+  });
 }
 
 export interface ValidGeneratedSkillAllocation {
