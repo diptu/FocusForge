@@ -90,3 +90,93 @@ export function updateStudySession(id: number, input: UpdateStudySessionInput) {
 export function deleteStudySession(id: number) {
   return apiFetch<void>(`/study-sessions/${id}`, { method: "DELETE" });
 }
+
+export type SkillTimeTotals = {
+  skillId: number;
+  slug: string;
+  name: string;
+  totalMinutes: number;
+  subSkills: { subSkillId: number; slug: string; name: string; totalMinutes: number }[];
+};
+
+export type TimePerSkillResponse = {
+  range: { kind: "week" | "month"; from: string; to: string };
+  skills: SkillTimeTotals[];
+};
+
+export type WeekOverWeekSkill = {
+  skillId: number;
+  slug: string;
+  name: string;
+  thisWeekMinutes: number;
+  lastWeekMinutes: number;
+  deltaMinutes: number;
+};
+
+export type WeekOverWeekResponse = {
+  thisWeek: { from: string; to: string };
+  lastWeek: { from: string; to: string };
+  skills: WeekOverWeekSkill[];
+};
+
+export function getTimePerSkill(range: "week" | "month" = "week") {
+  return apiFetch<TimePerSkillResponse>(`/analytics/time-per-skill?range=${range}`);
+}
+
+export function getWeekOverWeek() {
+  return apiFetch<WeekOverWeekResponse>("/analytics/week-over-week");
+}
+
+export type AdherenceSkill = {
+  skillId: number;
+  slug: string;
+  name: string;
+  targetMinutes: number | null;
+  actualMinutes: number;
+  adherencePercent: number | null;
+};
+
+export type AdherenceForWeekResponse = {
+  weekStartDate: string;
+  skills: AdherenceSkill[];
+};
+
+export type AdherenceTrendPoint = {
+  weekStartDate: string;
+  targetMinutes: number | null;
+  actualMinutes: number;
+  adherencePercent: number | null;
+};
+
+export type AdherenceTrendSkill = {
+  skillId: number;
+  slug: string;
+  name: string;
+  points: AdherenceTrendPoint[];
+};
+
+export type AdherenceTrendResponse = {
+  skills: AdherenceTrendSkill[];
+};
+
+export type SetPlannedTargetInput = {
+  skillId: number;
+  weekStartDate: string;
+  targetMinutes: number;
+};
+
+export function getAdherenceForWeek(weekStartDate?: string) {
+  const qs = weekStartDate ? `?weekStartDate=${weekStartDate}` : "";
+  return apiFetch<AdherenceForWeekResponse>(`/planned-targets/adherence${qs}`);
+}
+
+export function getAdherenceTrend(weeks = 6) {
+  return apiFetch<AdherenceTrendResponse>(`/planned-targets/adherence-trend?weeks=${weeks}`);
+}
+
+export function setPlannedTarget(input: SetPlannedTargetInput) {
+  return apiFetch<unknown>("/planned-targets", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
