@@ -31,6 +31,7 @@ export function TargetRow({
 
   const adherenceLabel =
     skill.adherencePercent == null ? "No target set" : `${skill.adherencePercent}% adherence`;
+  const hasTarget = skill.targetMinutes != null;
 
   return (
     <li className="flex flex-col gap-2 rounded-lg bg-surface p-3 sm:flex-row sm:items-center sm:justify-between">
@@ -59,6 +60,7 @@ export function TargetRow({
             min={1}
             defaultValue={skill.targetMinutes ?? undefined}
             placeholder="minutes"
+            aria-label={`${hasTarget ? "Edit" : "Set"} weekly target minutes for ${skill.name}`}
             required
             className="w-24 rounded-full border border-border bg-background px-3 py-1.5 text-sm text-foreground"
           />
@@ -67,7 +69,7 @@ export function TargetRow({
             disabled={isPending}
             className="rounded-full bg-brand px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-foreground transition-colors duration-[var(--duration-fast)] ease-standard disabled:opacity-60"
           >
-            {isPending ? "Saving…" : "Set"}
+            {isPending ? "Saving…" : hasTarget ? "Update" : "Set"}
           </button>
         </form>
         {status?.ok && <span className="text-sm text-success">Saved.</span>}
