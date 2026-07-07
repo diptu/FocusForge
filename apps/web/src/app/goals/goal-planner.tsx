@@ -54,9 +54,13 @@ export function GoalPlanner({ initialSkills }: { initialSkills: Skill[] }) {
     e.preventDefault();
     setError(undefined);
 
+    if (!description.trim()) {
+      setError("Enter a goal description.");
+      return;
+    }
     const weeks = Number(durationWeeks);
-    if (!description.trim() || !Number.isInteger(weeks) || weeks < 1) {
-      setError("Enter a goal description and a valid number of weeks.");
+    if (!Number.isInteger(weeks) || weeks < 1 || weeks > 52) {
+      setError("Enter a valid number of weeks (1-52).");
       return;
     }
     const cleanedScores = scores

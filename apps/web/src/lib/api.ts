@@ -38,6 +38,30 @@ export type CreateStudySessionInput = {
 
 export type UpdateStudySessionInput = Partial<CreateStudySessionInput>;
 
+/**
+ * Nest error bodies vary by how the exception was thrown: `{code, message}`
+ * for the domain-rule/custom-exception path used throughout this API,
+ * `{statusCode, message, error}` with `message` as a string or string[] for
+ * ValidationPipe/default HttpExceptions. Pull out a clean, human-readable
+ * message from whichever shape shows up instead of surfacing the raw
+ * "API POST /x failed: 409 {...}" wrapper to the user.
+ */
+function extractErrorMessage(status: number, body: string): string {
+  try {
+    const parsed: unknown = JSON.parse(body);
+    if (parsed && typeof parsed === "object") {
+      const message = (parsed as { message?: unknown }).message;
+      if (typeof message === "string" && message.length > 0) return message;
+      if (Array.isArray(message) && message.length > 0) return message.join(" ");
+      const error = (parsed as { error?: unknown }).error;
+      if (typeof error === "string" && error.length > 0) return error;
+    }
+  } catch {
+    // Not JSON — fall through to a generic message below.
+  }
+  return body || `Request failed with status ${status}`;
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const apiUrl = process.env.FOCUSFORGE_API_URL;
   const apiToken = process.env.FOCUSFORGE_API_TOKEN;
@@ -57,7 +81,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const body = await res.text().catch(() => "");
-    throw new Error(`FocusForge API ${init?.method ?? "GET"} ${path} failed: ${res.status} ${body}`);
+    throw new Error(extractErrorMessage(res.status, body));
   }
   if (res.status === 204) {
     return undefined as T;
