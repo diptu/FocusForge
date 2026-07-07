@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+} from "@nestjs/common";
 import { SkillsService } from "./skills.service";
 import { CreateSkillDto } from "./dto/create-skill.dto";
 import { CreateSubSkillDto } from "./dto/create-sub-skill.dto";
@@ -20,5 +30,11 @@ export class SkillsController {
   @Post(":skillId/sub-skills")
   createSubSkill(@Param("skillId", ParseIntPipe) skillId: number, @Body() dto: CreateSubSkillDto) {
     return this.skills.createSubSkill(skillId, dto);
+  }
+
+  @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param("id", ParseIntPipe) id: number) {
+    return this.skills.remove(id);
   }
 }

@@ -2,8 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { createGoalAction, generatePlansAction, selectPlanAction } from "./actions";
-import type { Goal, GoalPlanOption } from "@/lib/api";
+import {
+  createGoalAction,
+  createGoalCategoryAction,
+  deleteGoalCategoryAction,
+  generatePlansAction,
+  selectPlanAction,
+} from "./actions";
+import { TargetSkillsPicker } from "./target-skills-picker";
+import type { Goal, GoalPlanOption, Skill } from "@/lib/api";
 
 const TILE_GRADIENTS = [
   "var(--gradient-sunset)",
@@ -21,10 +28,12 @@ function formatMinutes(minutes: number): string {
 
 type Status = "idle" | "creating" | "generating" | "applying";
 
-export function GoalPlanner() {
+export function GoalPlanner({ initialSkills }: { initialSkills: Skill[] }) {
   const [description, setDescription] = useState("");
   const [durationWeeks, setDurationWeeks] = useState("12");
   const [scores, setScores] = useState<{ label: string; score: string }[]>([]);
+  const [skills, setSkills] = useState(initialSkills);
+  const [targetSkillIds, setTargetSkillIds] = useState<number[]>([]);
   const [goal, setGoal] = useState<Goal | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>();
@@ -45,9 +54,13 @@ export function GoalPlanner() {
     e.preventDefault();
     setError(undefined);
 
+    if (!description.trim()) {
+      setError("Enter a goal description.");
+      return;
+    }
     const weeks = Number(durationWeeks);
-    if (!description.trim() || !Number.isInteger(weeks) || weeks < 1) {
-      setError("Enter a goal description and a valid number of weeks.");
+    if (!Number.isInteger(weeks) || weeks < 1 || weeks > 52) {
+      setError("Enter a valid number of weeks (1-52).");
       return;
     }
     const cleanedScores = scores
@@ -59,6 +72,7 @@ export function GoalPlanner() {
       description: description.trim(),
       durationWeeks: weeks,
       currentScores: cleanedScores.length > 0 ? cleanedScores : undefined,
+      targetSkillIds: targetSkillIds.length > 0 ? targetSkillIds : undefined,
     });
     if (!created.ok || !created.goal) {
       setError(created.error ?? "Failed to create goal.");
@@ -160,6 +174,22 @@ export function GoalPlanner() {
           className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
         />
       </label>
+
+      <div className="flex flex-col gap-1.5">
+        <span className="text-sm text-foreground-muted">
+          Target categories (optional — pin exact skills, or let the goal description above imply
+          them)
+        </span>
+        <TargetSkillsPicker
+          skills={skills}
+          selectedIds={targetSkillIds}
+          onChange={setTargetSkillIds}
+          onSkillCreated={(skill) => setSkills((prev) => [...prev, skill])}
+          onCreate={createGoalCategoryAction}
+          onSkillDeleted={(id) => setSkills((prev) => prev.filter((s) => s.id !== id))}
+          onDelete={deleteGoalCategoryAction}
+        />
+      </div>
 
       <label className="flex max-w-xs flex-col gap-1 text-sm text-foreground-muted">
         Timeframe (weeks)

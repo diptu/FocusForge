@@ -59,6 +59,35 @@ export class SkillsService {
     }
   }
 
+  // Deletion isn't part of the seeded-reference-data design (aggregates.md),
+  // but custom categories (this session's own feature) need an undo path.
+  // Never destroys logged history: blocked if any StudySession exists under
+  // this skill's sub-skills, regardless of whether the skill is seeded or
+  // custom. Otherwise cascades PlannedTargets + SubSkills + the Skill row —
+  // none of that is real logged work, just plans and taxonomy.
+  async remove(id: number) {
+    const skill = await this.prisma.skill.findUnique({ where: { id } });
+    if (!skill) {
+      throw new NotFoundException(`Skill ${id} not found`);
+    }
+
+    const sessionCount = await this.prisma.studySession.count({
+      where: { subSkill: { skillId: id } },
+    });
+    if (sessionCount > 0) {
+      throw new ConflictException({
+        code: "SKILL_HAS_SESSIONS",
+        message: `Cannot delete "${skill.name}" — ${sessionCount} session${sessionCount === 1 ? "" : "s"} logged under it.`,
+      });
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.plannedTarget.deleteMany({ where: { skillId: id } }),
+      this.prisma.subSkill.deleteMany({ where: { skillId: id } }),
+      this.prisma.skill.delete({ where: { id } }),
+    ]);
+  }
+
   private mapWriteError(error: unknown, conflictCode: string, conflictMessage: string): Error {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return new ConflictException({ code: conflictCode, message: conflictMessage });

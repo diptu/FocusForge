@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import {
   createGoal,
+  createSkill,
+  deleteSkill,
   generateGoalPlans,
   selectGoalPlanOption,
   type CreateGoalInput,
@@ -10,6 +12,41 @@ import {
 } from "@/lib/api";
 
 export type GoalActionState = { ok: boolean; error?: string; goal?: Goal };
+
+export type CreateSkillActionState = {
+  ok: boolean;
+  error?: string;
+  id?: number;
+  slug?: string;
+  name?: string;
+};
+
+export async function createGoalCategoryAction(name: string): Promise<CreateSkillActionState> {
+  try {
+    const skill = await createSkill({ name });
+    revalidatePath("/goals");
+    revalidatePath("/log");
+    return { ok: true, id: skill.id, slug: skill.slug, name: skill.name };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Failed to add category." };
+  }
+}
+
+export type DeleteSkillActionState = { ok: boolean; error?: string };
+
+export async function deleteGoalCategoryAction(id: number): Promise<DeleteSkillActionState> {
+  try {
+    await deleteSkill(id);
+    revalidatePath("/goals");
+    revalidatePath("/log");
+    return { ok: true };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Failed to delete category.",
+    };
+  }
+}
 
 export async function createGoalAction(input: CreateGoalInput): Promise<GoalActionState> {
   try {

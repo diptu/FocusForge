@@ -35,6 +35,7 @@ export class GoalsService {
         description: validated.value.description,
         durationWeeks: validated.value.durationWeeks,
         currentScores: validated.value.currentScores as unknown as Prisma.InputJsonValue,
+        targetSkillIds: validated.value.targetSkillIds,
       },
     });
   }
@@ -68,10 +69,19 @@ export class GoalsService {
       });
     }
 
+    const [allSkills, targetSkills] = await Promise.all([
+      this.prisma.skill.findMany(),
+      goal.targetSkillIds.length > 0
+        ? this.prisma.skill.findMany({ where: { id: { in: goal.targetSkillIds } } })
+        : Promise.resolve([]),
+    ]);
+
     const raw = await this.planGenerator.generate({
       description: goal.description,
       durationWeeks: goal.durationWeeks,
       currentScores: (goal.currentScores as { label: string; score: string }[] | null) ?? [],
+      existingSkillNames: allSkills.map((s) => s.name),
+      targetSkillNames: targetSkills.map((s) => s.name),
     });
 
     const validated = validateGeneratedOptions(raw);
