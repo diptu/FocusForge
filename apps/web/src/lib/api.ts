@@ -69,6 +69,25 @@ export function getSkills() {
   return apiFetch<Skill[]>("/skills");
 }
 
+export type CreateSkillInput = { name: string };
+
+/** User-created custom category (e.g. "Statistics", "Linear Algebra"). */
+export function createSkill(input: CreateSkillInput) {
+  return apiFetch<Skill>("/skills", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export type CreateSubSkillInput = { name: string };
+
+export function createSubSkill(skillId: number, input: CreateSubSkillInput) {
+  return apiFetch<SubSkill>(`/skills/${skillId}/sub-skills`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
 export function getStudySessions() {
   return apiFetch<StudySession[]>("/study-sessions");
 }

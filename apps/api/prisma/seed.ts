@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { slugify } from "../src/domain/skill.rules";
 
 const prisma = new PrismaClient();
 
@@ -70,14 +71,6 @@ const taxonomy = [
     ],
   },
 ] as const;
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
 
 async function main() {
   for (const domain of taxonomy) {

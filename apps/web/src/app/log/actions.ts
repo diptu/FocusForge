@@ -1,7 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createStudySession, deleteStudySession, updateStudySession } from "@/lib/api";
+import {
+  createStudySession,
+  deleteStudySession,
+  updateStudySession,
+  createSkill,
+  createSubSkill,
+} from "@/lib/api";
 
 export type SessionFormState = { ok: boolean; error?: string };
 
@@ -52,4 +58,43 @@ export async function updateSessionAction(
 export async function deleteSessionAction(id: number): Promise<void> {
   await deleteStudySession(id);
   revalidatePath("/log");
+}
+
+export type CreateSkillFormState = {
+  ok: boolean;
+  error?: string;
+  skillId?: number;
+  slug?: string;
+  name?: string;
+};
+
+export async function createSkillAction(name: string): Promise<CreateSkillFormState> {
+  try {
+    const skill = await createSkill({ name });
+    revalidatePath("/log");
+    return { ok: true, skillId: skill.id, slug: skill.slug, name: skill.name };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Failed to add category." };
+  }
+}
+
+export type CreateSubSkillFormState = {
+  ok: boolean;
+  error?: string;
+  subSkillId?: number;
+  slug?: string;
+  name?: string;
+};
+
+export async function createSubSkillAction(
+  skillId: number,
+  name: string,
+): Promise<CreateSubSkillFormState> {
+  try {
+    const subSkill = await createSubSkill(skillId, { name });
+    revalidatePath("/log");
+    return { ok: true, subSkillId: subSkill.id, slug: subSkill.slug, name: subSkill.name };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Failed to add sub-skill." };
+  }
 }
