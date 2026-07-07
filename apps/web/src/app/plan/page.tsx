@@ -4,7 +4,7 @@ import { getAdherenceForWeek, getAdherenceTrend } from "@/lib/api";
 import { addDaysISO, todayISO, weekStartMondayISO } from "@/lib/date";
 import { TargetRow } from "./target-row";
 import { AdherenceTrend } from "./adherence-trend";
-import { AdherenceRing } from "./adherence-ring";
+import { AdherenceRing } from "@/components/adherence-ring";
 
 export const metadata: Metadata = {
   title: "Plan — FocusForge",
