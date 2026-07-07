@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: focusforge
+      POSTGRES_PASSWORD: focusforge
+      POSTGRES_DB: focusforge
+    ports:
+      - "5432:5432"
+    volumes:
+      - focusforge-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  focusforge-postgres-data:

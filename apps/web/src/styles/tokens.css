@@ -1,0 +1,147 @@
+/**
+ * FocusForge design tokens.
+ *
+ * Tailwind v4 reads utility values straight from these CSS custom
+ * properties (no tailwind.config.js). Two kinds of tokens live here:
+ *
+ * 1. Theme-static tokens (radius, shadow, duration, ease) — declared
+ *    directly inside `@theme` with literal values. They don't change
+ *    between light/dark, so there's nothing to alias.
+ * 2. Theme-dynamic tokens (color) — declared as plain custom properties
+ *    in `:root` / the dark media query, then aliased via `@theme inline`
+ *    so the generated utility (e.g. `bg-surface`) keeps resolving through
+ *    the variable at runtime instead of being baked in at build time.
+ *
+ * Rule for component code: no literal hex/px/ms. If a value isn't a token
+ * below, add it here first.
+ */
+
+:root {
+  /* Neutral surfaces */
+  --background: #ffffff;
+  --surface: #f8f8f9;
+  --surface-raised: #ffffff;
+  --foreground: #171717;
+  --foreground-muted: #5f6368;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+
+  /* Brand / system action color */
+  --brand: #4f46e5;
+  --brand-foreground: #ffffff;
+
+  /* Semantic status */
+  --success: #16a34a;
+  --warning: #b45309;
+  --danger: #dc2626;
+  --info: #0284c7;
+
+  /* Skill-domain accents (Quant / IELTS / JS / Stats / Deep Learning) —
+     chosen to stay visually distinct from each other and from the
+     semantic status colors above, for use in charts, tags, and the
+     skill-wise analytics dashboard (pm/roadmap.md Phase 2). */
+  --domain-quant: #2563eb;
+  --domain-ielts: #7c3aed;
+  --domain-js: #ca8a04;
+  --domain-stats: #0d9488;
+  --domain-dl: #e11d48;
+
+  /* Motion. Not a Tailwind `@theme` namespace (unlike color/radius/shadow/
+     ease) — `duration-*` utilities are numeric-only in Tailwind v4, so
+     these are consumed as `duration-[var(--duration-fast)]` rather than
+     a generated `duration-fast` class. Declared here so the
+     prefers-reduced-motion override below can still collapse them. */
+  --duration-fast: 100ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --surface: #151517;
+    --surface-raised: #1c1c1f;
+    --foreground: #ededed;
+    --foreground-muted: #a1a1aa;
+    --border: #27272a;
+    --border-strong: #3f3f46;
+
+    --brand: #6366f1;
+    --brand-foreground: #0a0a0a;
+
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #38bdf8;
+
+    --domain-quant: #60a5fa;
+    --domain-ielts: #a78bfa;
+    --domain-js: #eab308;
+    --domain-stats: #2dd4bf;
+    --domain-dl: #fb7185;
+  }
+}
+
+/* prefers-reduced-motion baseline (a11y standard, see ui/design_system.md).
+   Collapses every duration token to effectively-instant without removing
+   `transitionend`/`animationend` firing (hence 0.01ms, not 0). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0.01ms;
+    --duration-base: 0.01ms;
+    --duration-slow: 0.01ms;
+  }
+}
+
+@theme inline {
+  /* Color aliases -> generates bg-background, text-foreground,
+     border-border, bg-domain-quant, text-danger, etc. */
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+
+  --color-domain-quant: var(--domain-quant);
+  --color-domain-ielts: var(--domain-ielts);
+  --color-domain-js: var(--domain-js);
+  --color-domain-stats: var(--domain-stats);
+  --color-domain-dl: var(--domain-dl);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@theme {
+  /* Radius scale — slightly tighter than Tailwind's default, deliberately:
+     this is a data-dense analytics tool, not a marketing site. */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Shadow scale — flat by default, one step of elevation for
+     popovers/modals. Avoid stacking multiple shadow utilities. */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-md: 0 2px 8px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.12);
+
+  /* Easing — `--ease-*` IS a real Tailwind theme namespace, unlike
+     duration, so this generates a usable `ease-standard` utility. */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Spacing (--spacing) and breakpoints (--breakpoint-*) intentionally
+     NOT overridden: Tailwind v4's defaults already are a 4px base scale
+     (--spacing: 0.25rem) and sm=640/lg=1024, which is exactly the
+     mobile/tablet/desktop split this project uses. Documented, not
+     redefined, so there's one source of truth. */
+}

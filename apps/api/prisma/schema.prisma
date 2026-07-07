@@ -1,0 +1,89 @@
+// FocusForge data model — Epic 1 (pm/user_stories.md FF-1/FF-2/FF-3).
+//
+// Aggregate boundaries (see services/api/architecture/aggregates.md):
+//   - StudySession is its own aggregate root. It references SubSkill only —
+//     Skill is reached via `subSkill.skill`, deliberately NOT duplicated
+//     onto StudySession (see sa-adr-001). That removes an entire class of
+//     "subSkill belongs to a different skill than the stored skillId"
+//     invariant bugs by construction.
+//   - PlannedTarget is a separate aggregate root, scoped at the Skill level
+//     (not SubSkill — FF-16 sets targets per skill, not per sub-skill).
+//   - Skill / SubSkill are reference data (seeded), not aggregates: no
+//     lifecycle, no invariants beyond referential integrity.
+//
+// Business-rule invariants (durationMinutes > 0, occurredAt not in the
+// future, weekStartDate normalized to Monday) are enforced at the
+// application layer before writes, not as DB CHECK constraints — see
+// services/api/architecture/persistence_patterns.md for why.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Skill {
+  id        Int      @id @default(autoincrement())
+  /// Matches the frontend design tokens 1:1 (bg-domain-<slug> in
+  /// apps/web/src/styles/tokens.css) — "quant" | "ielts" | "js" | "stats" | "dl".
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+
+  subSkills      SubSkill[]
+  plannedTargets PlannedTarget[]
+}
+
+model SubSkill {
+  id        Int      @id @default(autoincrement())
+  skillId   Int
+  skill     Skill    @relation(fields: [skillId], references: [id])
+  slug      String
+  name      String
+  createdAt DateTime @default(now())
+
+  studySessions StudySession[]
+
+  @@unique([skillId, slug])
+}
+
+model StudySession {
+  id         Int      @id @default(autoincrement())
+  subSkillId Int
+  subSkill   SubSkill @relation(fields: [subSkillId], references: [id])
+
+  durationMinutes Int
+  /// Date only (no time-of-day) — a session belongs to a day, not a
+  /// timestamp. Stored as SQL DATE to avoid timezone drift on the day
+  /// value, which the FF-2 round-trip acceptance criterion depends on.
+  occurredAt      DateTime @db.Date
+  notes           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Supports Epic 3's rolling week/month aggregation (group by subSkill,
+  // filter by occurredAt range) and Epic 2's history view (list by date).
+  @@index([occurredAt])
+  @@index([subSkillId])
+}
+
+model PlannedTarget {
+  id      Int   @id @default(autoincrement())
+  skillId Int
+  skill   Skill @relation(fields: [skillId], references: [id])
+
+  /// Always the Monday of the target week (application-normalized) — see
+  /// persistence_patterns.md. Makes the uniqueness constraint below
+  /// actually mean "one target per skill per week."
+  weekStartDate DateTime @db.Date
+  targetMinutes Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([skillId, weekStartDate])
+}
