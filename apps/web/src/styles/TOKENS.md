@@ -1,6 +1,6 @@
 # FocusForge design tokens
 
-Source of truth: `src/styles/tokens.css`, imported by `src/app/globals.css`. Live usage examples: `src/app/page.tsx`.
+Source of truth: `src/styles/tokens.css`, imported by `src/app/globals.css`. Live usage examples: `src/app/design-system/page.tsx`.
 
 Tailwind v4 has no `tailwind.config.js` — utilities are generated straight from CSS custom properties declared in `@theme`. That means the token file *is* the config. Rule for all component code: no literal hex, px, or ms — if a value isn't below, add it as a token first, don't inline it.
 
