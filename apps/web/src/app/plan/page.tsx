@@ -4,6 +4,7 @@ import { getAdherenceForWeek, getAdherenceTrend } from "@/lib/api";
 import { addDaysISO, todayISO, weekStartMondayISO } from "@/lib/date";
 import { TargetRow } from "./target-row";
 import { AdherenceTrend } from "./adherence-trend";
+import { AdherenceRing } from "./adherence-ring";
 
 export const metadata: Metadata = {
   title: "Plan — FocusForge",
@@ -24,8 +25,14 @@ export default async function PlanPage({
   const nextWeek = addDaysISO(adherence.weekStartDate, 7);
   const isCurrentWeek = adherence.weekStartDate === weekStartMondayISO(todayISO());
 
+  const withTarget = adherence.skills.filter((s) => s.adherencePercent != null);
+  const avgAdherence =
+    withTarget.length === 0
+      ? null
+      : withTarget.reduce((sum, s) => sum + (s.adherencePercent ?? 0), 0) / withTarget.length;
+
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-16">
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 py-16">
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Plan vs actual</h1>
         <div className="flex items-center gap-3">
@@ -52,8 +59,12 @@ export default async function PlanPage({
         </div>
       </header>
 
+      <AdherenceRing percent={avgAdherence} />
+
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-medium text-foreground">Weekly targets &amp; adherence</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wider text-foreground">
+          Weekly targets &amp; adherence
+        </h2>
         <ul className="flex flex-col gap-2">
           {adherence.skills.map((skill) => (
             <TargetRow
@@ -66,7 +77,9 @@ export default async function PlanPage({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-medium text-foreground">Adherence trend (last 6 weeks)</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wider text-foreground">
+          Adherence trend (last 6 weeks)
+        </h2>
         <AdherenceTrend data={trend} />
       </section>
     </main>

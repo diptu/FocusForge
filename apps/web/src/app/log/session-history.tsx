@@ -10,7 +10,7 @@ export function SessionHistory({
 }) {
   if (sessions.length === 0) {
     return (
-      <div className="rounded-md border border-dashed border-border-strong p-6 text-center text-sm text-foreground-muted">
+      <div className="rounded-lg border border-dashed border-border-strong p-6 text-center text-sm text-foreground-muted">
         No sessions logged yet — use the form above to log your first one.
       </div>
     );

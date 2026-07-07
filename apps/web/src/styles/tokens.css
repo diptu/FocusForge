@@ -12,6 +12,12 @@
  *    so the generated utility (e.g. `bg-surface`) keeps resolving through
  *    the variable at runtime instead of being baked in at build time.
  *
+ * Gradients are a third kind: multi-stop `linear-gradient(...)` values
+ * can't go through the Tailwind color pipeline (color-mix, opacity
+ * modifiers, etc. assume a single color), so they stay plain custom
+ * properties and get consumed directly, e.g.
+ * `bg-[image:var(--gradient-sunset)]`.
+ *
  * Rule for component code: no literal hex/px/ms. If a value isn't a token
  * below, add it here first.
  */
@@ -26,8 +32,9 @@
   --border: #e4e4e7;
   --border-strong: #d4d4d8;
 
-  /* Brand / system action color */
-  --brand: #4f46e5;
+  /* Brand / system action color — vivid violet, the anchor hue for the
+     gradient accents below. */
+  --brand: #7c3aed;
   --brand-foreground: #ffffff;
 
   /* Semantic status */
@@ -45,6 +52,15 @@
   --domain-js: #ca8a04;
   --domain-stats: #0d9488;
   --domain-dl: #e11d48;
+
+  /* Gradient accents — sunset/ocean/mint are the three-stop mesh
+     gradients used on accent cards and badge tiles; page is the vivid
+     wash behind the floating app frame in layout.tsx. Vivid regardless
+     of color scheme, so no dark override for the card gradients. */
+  --gradient-sunset: linear-gradient(135deg, #8b5cf6 0%, #ec4899 55%, #fb923c 100%);
+  --gradient-ocean: linear-gradient(135deg, #ec4899 0%, #38bdf8 55%, #2dd4bf 100%);
+  --gradient-mint: linear-gradient(135deg, #2dd4bf 0%, #34d399 45%, #8b5cf6 100%);
+  --gradient-page: linear-gradient(135deg, #a78bfa 0%, #f472b6 45%, #fb923c 100%);
 
   /* Motion. Not a Tailwind `@theme` namespace (unlike color/radius/shadow/
      ease) — `duration-*` utilities are numeric-only in Tailwind v4, so
@@ -66,8 +82,8 @@
     --border: #27272a;
     --border-strong: #3f3f46;
 
-    --brand: #6366f1;
-    --brand-foreground: #0a0a0a;
+    --brand: #a78bfa;
+    --brand-foreground: #1e1033;
 
     --success: #22c55e;
     --warning: #f59e0b;
@@ -79,6 +95,11 @@
     --domain-js: #eab308;
     --domain-stats: #2dd4bf;
     --domain-dl: #fb7185;
+
+    /* Deeper, desaturated echo of the light-mode page gradient so the
+       floating frame still reads as dark-mode instead of a lit-up card
+       on a bright wash. */
+    --gradient-page: linear-gradient(135deg, #4c1d95 0%, #831843 45%, #7c2d12 100%);
   }
 }
 
@@ -123,17 +144,20 @@
 }
 
 @theme {
-  /* Radius scale — slightly tighter than Tailwind's default, deliberately:
-     this is a data-dense analytics tool, not a marketing site. */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  /* Radius scale — generously rounded. Cards, tiles, and buttons all
+     read as soft/pill-shaped rather than the previously tight,
+     data-table radius. */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
 
-  /* Shadow scale — flat by default, one step of elevation for
-     popovers/modals. Avoid stacking multiple shadow utilities. */
+  /* Shadow scale — soft elevation, plus `glow` for the tinted blur
+     that sits behind gradient cards/badges/tiles. */
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.04);
   --shadow-md: 0 2px 8px rgb(0 0 0 / 0.08);
-  --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.12);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.10);
+  --shadow-glow: 0 16px 32px -12px rgb(124 58 237 / 0.35);
 
   /* Easing — `--ease-*` IS a real Tailwind theme namespace, unlike
      duration, so this generates a usable `ease-standard` utility. */
