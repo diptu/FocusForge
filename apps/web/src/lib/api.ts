@@ -199,3 +199,67 @@ export function setPlannedTarget(input: SetPlannedTargetInput) {
     body: JSON.stringify(input),
   });
 }
+
+export type GoalScore = { label: string; score: string };
+
+export type GoalPlanSkillAllocation = {
+  name: string;
+  isNewCategory: boolean;
+  subSkills: string[];
+  weeklyMinutes: number;
+};
+
+export type GoalPlanScore = {
+  label: string;
+  current: string;
+  projected: string;
+  note: string;
+};
+
+export type GoalPlanOption = {
+  id: number;
+  goalId: number;
+  weeklyHours: number;
+  plan: { summary: string; skills: GoalPlanSkillAllocation[] };
+  tentativeScores: GoalPlanScore[];
+  createdAt: string;
+};
+
+export type Goal = {
+  id: number;
+  description: string;
+  durationWeeks: number;
+  currentScores: GoalScore[] | null;
+  createdAt: string;
+  appliedAt: string | null;
+  selectedPlanOptionId: number | null;
+  planOptions: GoalPlanOption[];
+  selectedPlanOption: GoalPlanOption | null;
+};
+
+export type CreateGoalInput = {
+  description: string;
+  durationWeeks: number;
+  currentScores?: GoalScore[];
+};
+
+export function createGoal(input: CreateGoalInput) {
+  return apiFetch<Goal>("/goals", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export function getGoal(id: number) {
+  return apiFetch<Goal>(`/goals/${id}`);
+}
+
+export function generateGoalPlans(id: number) {
+  return apiFetch<Goal>(`/goals/${id}/generate-plans`, { method: "POST" });
+}
+
+export function selectGoalPlanOption(goalId: number, optionId: number) {
+  return apiFetch<Goal>(`/goals/${goalId}/plan-options/${optionId}/select`, {
+    method: "POST",
+  });
+}

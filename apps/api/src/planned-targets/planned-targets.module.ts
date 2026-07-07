@@ -7,5 +7,6 @@ import { SkillsModule } from "../skills/skills.module";
   imports: [SkillsModule],
   controllers: [PlannedTargetsController],
   providers: [PlannedTargetsService],
+  exports: [PlannedTargetsService],
 })
 export class PlannedTargetsModule {}

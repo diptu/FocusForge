@@ -7,6 +7,7 @@ import { SkillsModule } from "./skills/skills.module";
 import { StudySessionsModule } from "./study-sessions/study-sessions.module";
 import { AnalyticsModule } from "./analytics/analytics.module";
 import { PlannedTargetsModule } from "./planned-targets/planned-targets.module";
+import { GoalsModule } from "./goals/goals.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PlannedTargetsModule } from "./planned-targets/planned-targets.module";
     StudySessionsModule,
     AnalyticsModule,
     PlannedTargetsModule,
+    GoalsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ApiTokenGuard }],
 })
