@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import {
   createGoal,
   createSkill,
+  deleteSkill,
   generateGoalPlans,
   selectGoalPlanOption,
   type CreateGoalInput,
@@ -28,6 +29,22 @@ export async function createGoalCategoryAction(name: string): Promise<CreateSkil
     return { ok: true, id: skill.id, slug: skill.slug, name: skill.name };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "Failed to add category." };
+  }
+}
+
+export type DeleteSkillActionState = { ok: boolean; error?: string };
+
+export async function deleteGoalCategoryAction(id: number): Promise<DeleteSkillActionState> {
+  try {
+    await deleteSkill(id);
+    revalidatePath("/goals");
+    revalidatePath("/log");
+    return { ok: true };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Failed to delete category.",
+    };
   }
 }
 

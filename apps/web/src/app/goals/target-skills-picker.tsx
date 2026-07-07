@@ -9,6 +9,8 @@ export function TargetSkillsPicker({
   onChange,
   onSkillCreated,
   onCreate,
+  onSkillDeleted,
+  onDelete,
 }: {
   skills: Skill[];
   selectedIds: number[];
@@ -17,11 +19,15 @@ export function TargetSkillsPicker({
   onCreate: (
     name: string,
   ) => Promise<{ ok: boolean; error?: string; id?: number; slug?: string; name?: string }>;
+  onSkillDeleted: (id: number) => void;
+  onDelete: (id: number) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState("");
   const [error, setError] = useState<string>();
   const [isPending, startTransition] = useTransition();
+  const [deletingId, setDeletingId] = useState<number>();
+  const [isDeleting, startDeleteTransition] = useTransition();
 
   function toggle(id: number) {
     onChange(
@@ -59,25 +65,65 @@ export function TargetSkillsPicker({
     });
   }
 
+  function handleDelete(skill: Skill) {
+    if (
+      !confirm(
+        `Delete the "${skill.name}" category? This can't be undone, and only works if no sessions are logged under it.`,
+      )
+    ) {
+      return;
+    }
+    setError(undefined);
+    setDeletingId(skill.id);
+    startDeleteTransition(async () => {
+      const result = await onDelete(skill.id);
+      if (result.ok) {
+        onSkillDeleted(skill.id);
+        onChange(selectedIds.filter((id) => id !== skill.id));
+      } else {
+        setError(result.error ?? "Failed to delete category.");
+      }
+      setDeletingId(undefined);
+    });
+  }
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
         {skills.map((skill) => {
           const active = selectedIds.includes(skill.id);
+          const isDeletingThis = isDeleting && deletingId === skill.id;
           return (
-            <button
+            <span
               key={skill.id}
-              type="button"
-              onClick={() => toggle(skill.id)}
-              aria-pressed={active}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors duration-[var(--duration-fast)] ease-standard ${
+              className={`inline-flex items-center gap-1 rounded-full py-1.5 pl-3 pr-1.5 text-xs font-bold uppercase tracking-wide transition-colors duration-[var(--duration-fast)] ease-standard ${
                 active
                   ? "bg-brand text-brand-foreground"
                   : "bg-surface text-foreground-muted hover:text-foreground"
               }`}
             >
-              {skill.name}
-            </button>
+              <button
+                type="button"
+                onClick={() => toggle(skill.id)}
+                aria-pressed={active}
+                disabled={isDeletingThis}
+                className="disabled:opacity-60"
+              >
+                {isDeletingThis ? "Deleting…" : skill.name}
+              </button>
+              {!isDeletingThis && (
+                <button
+                  type="button"
+                  onClick={() => handleDelete(skill)}
+                  aria-label={`Delete ${skill.name} category`}
+                  className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] leading-none normal-case transition-colors duration-[var(--duration-fast)] ease-standard ${
+                    active ? "hover:bg-white/20" : "hover:bg-border-strong"
+                  }`}
+                >
+                  ×
+                </button>
+              )}
+            </span>
           );
         })}
 

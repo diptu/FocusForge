@@ -88,6 +88,11 @@ export function createSubSkill(skillId: number, input: CreateSubSkillInput) {
   });
 }
 
+/** Rejected (409) if any study session is logged under this skill. */
+export function deleteSkill(id: number) {
+  return apiFetch<void>(`/skills/${id}`, { method: "DELETE" });
+}
+
 export function getStudySessions() {
   return apiFetch<StudySession[]>("/study-sessions");
 }

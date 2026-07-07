@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   createGoalAction,
   createGoalCategoryAction,
+  deleteGoalCategoryAction,
   generatePlansAction,
   selectPlanAction,
 } from "./actions";
@@ -181,6 +182,8 @@ export function GoalPlanner({ initialSkills }: { initialSkills: Skill[] }) {
           onChange={setTargetSkillIds}
           onSkillCreated={(skill) => setSkills((prev) => [...prev, skill])}
           onCreate={createGoalCategoryAction}
+          onSkillDeleted={(id) => setSkills((prev) => prev.filter((s) => s.id !== id))}
+          onDelete={deleteGoalCategoryAction}
         />
       </div>
 
