@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  ServiceUnavailableException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -93,16 +97,29 @@ export class AnthropicPlanGeneratorService {
 
   /** Returns the raw parsed JSON — caller runs it through validateGeneratedOptions. */
   async generate(input: PlanGenerationInput): Promise<unknown> {
-    const response = await this.getClient().messages.create({
-      model: "claude-opus-4-8",
-      max_tokens: 16000,
-      thinking: { type: "adaptive" },
-      output_config: {
-        effort: "high",
-        format: { type: "json_schema", schema: RESPONSE_SCHEMA },
-      },
-      messages: [{ role: "user", content: this.buildPrompt(input) }],
-    });
+    let response: Anthropic.Message;
+    try {
+      response = await this.getClient().messages.create({
+        model: "claude-opus-4-8",
+        max_tokens: 16000,
+        thinking: { type: "adaptive" },
+        output_config: {
+          effort: "high",
+          format: { type: "json_schema", schema: RESPONSE_SCHEMA },
+        },
+        messages: [{ role: "user", content: this.buildPrompt(input) }],
+      });
+    } catch (error) {
+      // Surface the real reason (bad key, rate limit, low credit balance,
+      // etc.) instead of letting it collapse into a bare 500 — this is the
+      // one call in the app that depends on a third-party account being in
+      // good standing, so the failure mode is genuinely different from an
+      // internal bug.
+      if (error instanceof Anthropic.APIError) {
+        throw new ServiceUnavailableException(`Claude API error: ${error.message}`);
+      }
+      throw error;
+    }
 
     if (response.stop_reason === "refusal") {
       throw new InternalServerErrorException(
