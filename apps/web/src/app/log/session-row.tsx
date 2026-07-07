@@ -43,7 +43,7 @@ export function SessionRow({ session, skills }: { session: StudySession; skills:
 
   if (!editing) {
     return (
-      <li className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface p-3">
+      <li className="flex items-center justify-between gap-3 rounded-lg bg-surface p-3">
         <div className="flex items-center gap-3">
           <span
             aria-hidden
@@ -81,13 +81,13 @@ export function SessionRow({ session, skills }: { session: StudySession; skills:
   }
 
   return (
-    <li className="rounded-md border border-border-strong bg-surface-raised p-3 shadow-sm">
+    <li className="rounded-lg border border-border-strong bg-surface-raised p-3 shadow-sm">
       <form action={handleSubmit} className="flex flex-col gap-2">
         <div className="grid gap-2 sm:grid-cols-2">
           <select
             value={skillId}
             onChange={(e) => setSkillId(e.target.value)}
-            className="rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+            className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground"
           >
             {skills.map((skill) => (
               <option key={skill.id} value={skill.id}>
@@ -100,7 +100,7 @@ export function SessionRow({ session, skills }: { session: StudySession; skills:
             name="subSkillId"
             defaultValue={session.subSkillId}
             required
-            className="rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+            className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground"
           >
             {subSkills.map((sub) => (
               <option key={sub.id} value={sub.id}>
@@ -116,7 +116,7 @@ export function SessionRow({ session, skills }: { session: StudySession; skills:
             min={1}
             defaultValue={session.durationMinutes}
             required
-            className="rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+            className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground"
           />
           <input
             type="date"
@@ -124,20 +124,20 @@ export function SessionRow({ session, skills }: { session: StudySession; skills:
             defaultValue={session.occurredAt.slice(0, 10)}
             max={todayISO()}
             required
-            className="rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+            className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground"
           />
         </div>
         <textarea
           name="notes"
           rows={2}
           defaultValue={session.notes ?? ""}
-          className="rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+          className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground"
         />
         <div className="flex items-center gap-3">
           <button
             type="submit"
             disabled={isPending}
-            className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-brand-foreground transition-colors duration-[var(--duration-fast)] ease-standard disabled:opacity-60"
+            className="rounded-full bg-brand px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-foreground transition-colors duration-[var(--duration-fast)] ease-standard disabled:opacity-60"
           >
             {isPending ? "Saving…" : "Save"}
           </button>

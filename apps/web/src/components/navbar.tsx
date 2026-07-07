@@ -16,14 +16,20 @@ export function Navbar() {
 
   return (
     <header className="border-b border-border">
-      <nav className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
+      <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
         <Link
           href="/"
-          className="text-sm font-medium text-foreground"
+          className="flex items-center gap-2 rounded-full bg-surface py-1.5 pl-1.5 pr-3.5"
         >
-          FocusForge
+          <span
+            aria-hidden
+            className="h-6 w-6 shrink-0 rounded-full bg-[image:var(--gradient-sunset)]"
+          />
+          <span className="text-xs font-bold uppercase tracking-wide text-foreground">
+            FocusForge
+          </span>
         </Link>
-        <ul className="flex gap-1">
+        <ul className="flex items-center gap-1 rounded-full bg-surface p-1">
           {links.map((link) => {
             const active = pathname === link.href;
             return (
@@ -31,9 +37,9 @@ export function Navbar() {
                 <Link
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-[var(--duration-fast)] ease-standard ${
+                  className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors duration-[var(--duration-fast)] ease-standard ${
                     active
-                      ? "bg-surface text-foreground"
+                      ? "bg-brand text-brand-foreground shadow-sm"
                       : "text-foreground-muted hover:text-foreground"
                   }`}
                 >

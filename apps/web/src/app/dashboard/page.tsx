@@ -15,7 +15,7 @@ export default async function DashboardPage() {
   ]);
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-16">
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 py-16">
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
         <p className="text-sm text-foreground-muted">
@@ -25,8 +25,10 @@ export default async function DashboardPage() {
 
       <TimePerSkillView week={week} month={month} />
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-medium text-foreground">This week vs last week</h2>
+      <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface-raised p-4 shadow-sm">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-foreground">
+          This week vs last week
+        </h2>
         <WeekOverWeek data={weekOverWeek} />
       </section>
     </main>

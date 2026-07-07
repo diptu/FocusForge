@@ -18,6 +18,19 @@ const statuses = [
   { name: "Info", className: "bg-info" },
 ] as const;
 
+const gradients = [
+  { name: "sunset", var: "var(--gradient-sunset)" },
+  { name: "ocean", var: "var(--gradient-ocean)" },
+  { name: "mint", var: "var(--gradient-mint)" },
+] as const;
+
+const radii = [
+  { name: "sm", className: "rounded-sm" },
+  { name: "md", className: "rounded-md" },
+  { name: "lg", className: "rounded-lg" },
+  { name: "xl", className: "rounded-xl" },
+] as const;
+
 export default function DesignSystem() {
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-16">
@@ -86,6 +99,46 @@ export default function DesignSystem() {
             >
               {d.name}
             </span>
+          ))}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium text-foreground">Gradients</h2>
+        <p className="text-sm text-foreground-muted">
+          Three-stop mesh gradients for accent cards, badges, and the progress
+          ring — consumed as{" "}
+          <code className="rounded-sm bg-surface px-1.5 py-0.5 text-sm">
+            bg-[image:var(--gradient-name)]
+          </code>{" "}
+          since a multi-stop gradient can&apos;t travel through the Tailwind
+          color pipeline like a single color token can.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {gradients.map((g) => (
+            <div
+              key={g.name}
+              style={{ backgroundImage: g.var }}
+              className="flex h-16 w-32 items-end rounded-lg p-2 shadow-glow"
+            >
+              <span className="text-xs font-bold uppercase tracking-wide text-white">
+                {g.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium text-foreground">Radius</h2>
+        <div className="flex flex-wrap gap-2">
+          {radii.map((r) => (
+            <div
+              key={r.name}
+              className={`flex h-16 w-16 items-center justify-center border border-border bg-surface text-xs text-foreground-muted ${r.className}`}
+            >
+              {r.name}
+            </div>
           ))}
         </div>
       </section>

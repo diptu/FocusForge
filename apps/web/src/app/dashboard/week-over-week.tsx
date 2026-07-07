@@ -21,7 +21,7 @@ export function WeekOverWeek({ data }: { data: WeekOverWeekResponse }) {
         return (
           <li
             key={skill.skillId}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-surface p-3"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-surface p-3"
           >
             <div className="flex items-center gap-2">
               <span

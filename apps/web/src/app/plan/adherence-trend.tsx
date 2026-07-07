@@ -20,17 +20,17 @@ export function AdherenceTrend({ data }: { data: AdherenceTrendResponse }) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-md border border-border">
+    <div className="overflow-x-auto rounded-lg border border-border bg-surface-raised shadow-sm">
       <table className="w-full min-w-[520px] border-collapse text-sm">
         <thead>
           <tr>
-            <th className="border-b border-border bg-surface px-3 py-2 text-left font-medium text-foreground-muted">
+            <th className="border-b border-border bg-surface px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-foreground-muted">
               Skill
             </th>
             {weeks.map((w) => (
               <th
                 key={w}
-                className="border-b border-border bg-surface px-3 py-2 text-right font-medium text-foreground-muted"
+                className="border-b border-border bg-surface px-3 py-2 text-right text-xs font-bold uppercase tracking-wide text-foreground-muted"
               >
                 {w}
               </th>

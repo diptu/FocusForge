@@ -21,7 +21,7 @@ export function LogSessionForm({ skills }: { skills: Skill[] }) {
 
   if (skills.length === 0) {
     return (
-      <p className="rounded-md border border-border bg-surface p-4 text-sm text-foreground-muted">
+      <p className="rounded-lg border border-border bg-surface p-4 text-sm text-foreground-muted">
         No skills configured yet — seed the API before logging a session.
       </p>
     );
@@ -31,7 +31,7 @@ export function LogSessionForm({ skills }: { skills: Skill[] }) {
     <form
       ref={formRef}
       action={formAction}
-      className="flex flex-col gap-3 rounded-md border border-border bg-surface p-4"
+      className="flex flex-col gap-3 rounded-lg border border-border bg-surface-raised p-4 shadow-sm"
     >
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm text-foreground-muted">
@@ -39,7 +39,7 @@ export function LogSessionForm({ skills }: { skills: Skill[] }) {
           <select
             value={skillId}
             onChange={(e) => setSkillId(e.target.value)}
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
           >
             {skills.map((skill) => (
               <option key={skill.id} value={skill.id}>
@@ -55,7 +55,7 @@ export function LogSessionForm({ skills }: { skills: Skill[] }) {
             name="subSkillId"
             defaultValue=""
             required
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
           >
             <option value="" disabled>
               Choose…
@@ -77,7 +77,7 @@ export function LogSessionForm({ skills }: { skills: Skill[] }) {
             name="durationMinutes"
             min={1}
             required
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm text-foreground-muted">
@@ -88,7 +88,7 @@ export function LogSessionForm({ skills }: { skills: Skill[] }) {
             defaultValue={todayISO()}
             max={todayISO()}
             required
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
           />
         </label>
       </div>
@@ -98,7 +98,7 @@ export function LogSessionForm({ skills }: { skills: Skill[] }) {
         <textarea
           name="notes"
           rows={2}
-          className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+          className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
         />
       </label>
 
@@ -106,7 +106,7 @@ export function LogSessionForm({ skills }: { skills: Skill[] }) {
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-brand-foreground transition-colors duration-[var(--duration-fast)] ease-standard disabled:opacity-60"
+          className="rounded-full bg-brand px-4 py-2 text-xs font-bold uppercase tracking-wide text-brand-foreground transition-colors duration-[var(--duration-fast)] ease-standard disabled:opacity-60"
         >
           {isPending ? "Saving…" : "Log session"}
         </button>

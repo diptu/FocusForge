@@ -11,7 +11,7 @@ export default async function LogPage() {
   const [skills, sessions] = await Promise.all([getSkills(), getStudySessions()]);
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-16">
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 py-16">
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Log a session
@@ -24,7 +24,7 @@ export default async function LogPage() {
       <LogSessionForm skills={skills} />
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-medium text-foreground">History</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wider text-foreground">History</h2>
         <SessionHistory sessions={sessions} skills={skills} />
       </section>
     </main>
