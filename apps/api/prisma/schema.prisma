@@ -87,3 +87,52 @@ model PlannedTarget {
 
   @@unique([skillId, weekStartDate])
 }
+
+/// LLM-guided planning (extends Epic 4 with an AI-assisted entry point —
+/// the learner states a goal, gets 3 candidate weekly-hour plans back, and
+/// picking one materializes as ordinary PlannedTarget rows across the
+/// goal's timeframe). Goal/GoalPlanOption are reference-ish records of a
+/// planning session, not aggregates: no invariants beyond the one-selected-
+/// option constraint below, enforced at the application layer (see
+/// goal-plan.rules.ts) the same way PlannedTarget's normalization is.
+model Goal {
+  id            Int      @id @default(autoincrement())
+  /// Free text — "Complete GRE and IELTS in 3 months" — not constrained to
+  /// existing Skill names; the LLM plan may reference categories that get
+  /// created on selection (see goals.service.ts).
+  description   String
+  durationWeeks Int
+  /// Optional current mock-test scores, e.g. [{"label":"GRE","score":"310"}].
+  /// Free-form per exam since scoring scales differ (GRE 260-340, IELTS
+  /// 0-9 bands) — not worth a typed schema for a handful of display strings.
+  currentScores Json?
+  createdAt     DateTime @default(now())
+  /// Set when a plan option is selected and its PlannedTargets are created.
+  appliedAt     DateTime?
+
+  planOptions          GoalPlanOption[] @relation("GoalOptions")
+  selectedPlanOptionId Int?             @unique
+  selectedPlanOption   GoalPlanOption?  @relation("SelectedPlan", fields: [selectedPlanOptionId], references: [id])
+}
+
+model GoalPlanOption {
+  id     Int  @id @default(autoincrement())
+  goalId Int
+  goal   Goal @relation("GoalOptions", fields: [goalId], references: [id])
+
+  /// 40 / 30 / 20 — the three candidate weekly commitments generated per goal.
+  weeklyHours Int
+  /// Structured breakdown: per-skill (and, for new categories, per-sub-skill)
+  /// weekly minutes plus a short rationale. Shape documented in
+  /// goal-plan.rules.ts rather than modeled as columns — it's LLM output,
+  /// not something the application writes field-by-field.
+  plan Json
+  /// Tentative projected scores per exam, e.g.
+  /// [{"label":"GRE","current":"310","projected":"320","note":"..."}].
+  /// Always rendered with an "AI estimate" disclaimer — never persisted or
+  /// displayed as a guarantee.
+  tentativeScores Json?
+  createdAt       DateTime @default(now())
+
+  selectedForGoal Goal? @relation("SelectedPlan")
+}

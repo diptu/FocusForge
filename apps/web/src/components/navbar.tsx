@@ -8,6 +8,7 @@ const links = [
   { href: "/log", label: "Log" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/plan", label: "Plan" },
+  { href: "/goals", label: "Goals" },
   { href: "/design-system", label: "Design tokens" },
 ] as const;
 
